@@ -1,0 +1,16 @@
+{{- range $componentName, $component := .Values.app6.components }}
+{{- if $component.frontendConfig }}
+{{- if and $component.enabled $component.frontendConfig.enabled }}
+{{- $componentDict := (dict "global" $ "component" $component "componentName" $componentName "Chart" $.Chart "Release" $.Release ) }}
+---
+kind: FrontendConfig
+apiVersion: networking.gke.io/v1beta1
+metadata:
+  name: {{ include "componentName" $componentDict }}
+spec:
+  sslPolicy: {{ $component.frontendConfig.sslPolicy }}
+  redirectToHttps:
+    {{- toYaml $component.frontendConfig.redirectToHttps | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,39 @@
+{{- range $componentName, $component := .Values.app1.components }}
+{{- if $component.service }}
+{{- if and $component.enabled $component.service.enabled }}
+{{- $componentDict := (dict "global" $ "component" $component "componentName" $componentName "Chart" $.Chart "Release" $.Release ) }}
+{{- $containerPorts := include "servicePorts" $component }}
+{{- if $containerPorts }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "componentName" $componentDict }}
+  labels:
+    {{- include "labels" $componentDict | nindent 4 }}
+    {{- with $component.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $component.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $component.service.type }}
+  internalTrafficPolicy: {{ $component.service.internalTrafficPolicy }}
+  ipFamilies:
+  {{- toYaml $component.service.ipFamilies | nindent 4 }}
+  ports:
+    {{- include "servicePorts" $component | indent 4 }}
+  selector:
+    {{- include "selectorLabels" $componentDict | nindent 4 }}
+    {{- if ($component.deployment.selector).matchLabels }}
+    {{- toYaml $component.deployment.selector.matchLabels | nindent 4 }}
+    {{- with $component.deployment.selector.matchLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

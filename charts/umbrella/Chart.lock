@@ -1,0 +1,33 @@
+dependencies:
+- name: app1
+  repository: file://../app1
+  version: 0.1.0
+- name: app2
+  repository: file://../app2
+  version: 0.1.0
+- name: app3
+  repository: file://../app3
+  version: 0.1.0
+- name: app4
+  repository: file://../app4
+  version: 0.1.0
+- name: app5
+  repository: file://../app5
+  version: 0.1.0
+- name: app6
+  repository: file://../app6
+  version: 0.1.0
+- name: app7
+  repository: file://../app7
+  version: 0.1.0
+- name: app8
+  repository: file://../app8
+  version: 0.1.0
+- name: app9
+  repository: file://../app9
+  version: 0.1.0
+- name: app10
+  repository: file://../app10
+  version: 0.1.0
+digest: sha256:d17e5121ea4cee654a5ca9108c85da4028dd87121cf79c2724235997567ec77d
+generated: "2025-02-21T11:34:07.442334-08:00"

@@ -1,0 +1,34 @@
+{{- $flattenedConfigMaps := include "flattenConfigMaps" .Values.app7 | fromYaml -}}
+{{- range $key, $configMap := $flattenedConfigMaps }}
+{{- if or $configMap.data $configMap.binaryData }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $configMap.name }}
+  labels:
+    app.kubernetes.io/component: {{ $key | splitList "_" | first }}
+{{- if $configMap.binaryData }}
+binaryData:
+  {{- range $_, $binaryDataValue := $configMap.binaryData }}
+  {{ $binaryDataValue.name }}: {{ $binaryDataValue.value }}
+  {{- end }}
+{{- end }}
+{{- if $configMap.data }}
+data:
+  {{- range $_, $dataValue := $configMap.data }}
+  {{- if hasKey $dataValue "template" }}
+  {{ $dataValue.name }}: |-
+    {{- $_ := set $dataValue.variables "global" $.Values.global }}
+    {{- $templateContent := $.Files.Get (printf "files/%s" $dataValue.template) }}
+    {{- tpl $templateContent $dataValue.variables | nindent 4 }}
+  {{- else }}
+  {{- if $dataValue.value }}
+  {{ $dataValue.name }}: |-
+    {{- $dataValue.value | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

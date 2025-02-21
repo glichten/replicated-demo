@@ -1,0 +1,165 @@
+apiVersion: kots.io/v1beta2
+kind: HelmChart
+metadata:
+  name: chart-name
+spec:
+  optionalValues:
+  - when: repl{{ ConfigOptionEquals "provider" "aws" | quote }}
+    recursiveMerge: true
+    values:
+      global:
+        clusterName: '{{repl ConfigOption "cluster_name" }}'
+        domain: repl{{ ConfigOption "domain_name" }}
+        environment: '{{repl ConfigOption "environment" }}'
+        namespace: '{{repl Namespace}}'
+        provider: '{{repl ConfigOption "provider" }}'
+        region: '{{repl ConfigOption "region" }}'
+        revisionHistoryLimit: 2
+
+      app1:
+        app1:
+          components:
+            app1:
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+
+      app3:
+        app3:
+          components:
+            app3:
+              deployment:
+                containers:
+                  app3:
+                    env:
+                      CLOUD_PROVIDER:
+                        value: '{{repl ConfigOption "provider" }}'
+                      SEGMENT_ENABLED:
+                        enabled: true
+                        value: "true"
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+
+      app6:
+        app6:
+          components:
+            app6:
+              deployment:
+                containers:
+                  app6:
+                    env:
+                      AWS_ACCOUNT_ID:
+                        enabled: true
+                      ORG_ID:
+                        value: '{{repl ConfigOption "cluster_name" }}'
+                        enabled: true
+                      AWS_REGION:
+                        value: '{{repl ConfigOption "region" }}'
+                        enabled: true
+                      CLOUD_PROVIDER:
+                        value: '{{repl ConfigOption "provider" }}'
+                      DB_ENABLE_SSL:
+                        value: allow
+                      DB_ENDPOINT:
+                        value: '{{repl ConfigOption "aws_db_endpoint" }}'
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+
+      app7:
+        app7:
+          components:
+            app7:
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+
+      app8:
+        app8:
+          components:
+            app8:
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+              deployment:
+                containers:
+                  app8:
+                    env:
+                      CLOUD_PROVIDER:
+                        value: '{{repl ConfigOption "provider" }}'
+                      AWS_ACCOUNT_ID:
+                        enabled: true
+                      AWS_REGION:
+                        value: '{{repl ConfigOption "region" }}'
+                        enabled: true
+                      ENABLE_RECAPTCHA:
+                        value: "false"
+                      DB_ENABLE_SSL:
+                        value: allow
+                      DB_ENDPOINT:
+                        value: '{{repl ConfigOption "aws_db_endpoint" }}'
+                      ORG_ID:
+                        value: '{{repl ConfigOption "cluster_name" }}'
+                        enabled: true
+                      REDIS_URL:
+                        value: '{{repl ConfigOption "redis_url" }}'
+                      APPLICATION_DOMAIN:
+                        value: repl{{ ConfigOption "subdomain_name" }}.repl{{ ConfigOption "domain_name" }}
+                  alloyDBProxy:
+                    enabled: false
+          configMap:
+            app8:
+              binaryData:
+              - name: saml-keystore.jks
+                value: '{{repl ConfigOption "saml_keystore" }}'
+
+      app9:
+        app9:
+          components:
+            app9:
+              deployment:
+                containers:
+                  app9:
+                    env:
+                      APPLICATION_DOMAIN:
+                        value: repl{{ ConfigOption "subdomain_name" }}.repl{{ ConfigOption "domain_name" }}
+                      AWS_ACCOUNT_ID:
+                        enabled: true
+                      ORG_ID:
+                        enabled: true
+                        value: '{{repl ConfigOption "cluster_name" }}'
+                      AWS_REGION:
+                        enabled: true
+                        value: '{{repl ConfigOption "region" }}'
+                      CLOUD_PROVIDER:
+                        value: '{{repl ConfigOption "provider" }}'
+                      DB_ENABLE_SSL:
+                        value: allow
+                      DB_ENDPOINT:
+                        value: '{{repl ConfigOption "aws_db_endpoint" }}'
+                      REDIS_URL:
+                        value: '{{repl ConfigOption "redis_url" }}'
+                    volumeMounts:
+                      config:
+                        enabled: false
+                      secret:
+                        enabled: false
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+
+      app10:
+        app10:
+          components:
+            app10:
+              serviceAccount:
+                name: '{{repl ConfigOption "service_account" }}'
+              deployment:
+                containers:
+                  app8:
+                    env:
+                      CLOUD_PROVIDER:
+                        value: '{{repl ConfigOption "provider" }}'
+                      AWS_ACCOUNT_ID:
+                        enabled: true
+                      AWS_REGION:
+                        value: '{{repl ConfigOption "region" }}'
+                        enabled: true
+                      AWS_BUCKET:
+                        enabled: true
+                        value: '{{repl ConfigOption "aws_s3_bucket" }}'

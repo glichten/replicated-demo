@@ -1,0 +1,81 @@
+apiVersion: kots.io/v1beta2
+kind: HelmChart
+metadata:
+  name: chart-name
+spec:
+  # chart identifies a matching chart from a .tgz
+  chart:
+    name: chart-name
+    chartVersion: chart-version
+  releaseName: chart-name
+  # weight determines the order that charts are applied, with lower weights first.
+  weight: 42
+  # values are used in the customer environment as a pre-render step
+  # these values are supplied to helm template
+  values:
+    global:
+      imagePullSecrets:
+      - name: '{{repl ImagePullSecretName }}'
+      # While many of these images won't actually be used, they are included here to ensure that the
+      # helm charts will still be able to render correctly if they've been set to enabled by default.
+      alloyDBProxy:
+        image:
+          name: gcr.io/alloydb-connectors/alloydb-auth-proxy
+          tag: 1.2.4-alpine
+      alloydbProxy:
+        image:
+          repository: gcr.io/alloydb-connectors/alloydb-auth-proxy
+          tag: 1.2.4-alpine
+        cluster: alloydb-dev-1
+      cloudSqlProxy:
+        image:
+          name: gcr.io/cloudsql-docker/gce-proxy
+          tag: ""
+          pullPolicy: Always
+          repository: gcr.io/cloudsql-docker/gce-proxy
+        instances: qordoba-devel:us-central1:dev-sql-1=tcp:3306
+      envoy:
+        image:
+          name: envoyproxy/envoy
+          tag: v1.24.1
+
+    # Loop through all the default values in the chart & prepend image name with:
+    # repl{{ HasLocalRegistry | ternary LocalRegistryHost "proxy.replicated.com" }}/proxy/<chart-name>/
+
+  optionalValues:
+  - when: repl{{ ConfigOptionEquals "provider" "aws" | quote }}
+    recursiveMerge: true
+    values: {}
+  - when: repl{{ ConfigOptionEquals "provider" "gcp" | quote }}
+    recursiveMerge: true
+    values: {}
+
+  builder:
+    global:
+      clusterName: example-cluster
+      domain: example.com
+      environment: dev
+      namespace: umbrella
+      provider: none
+      region: none
+      revisionHistoryLimit: 2
+      alloyDBProxy:
+        image:
+          name: gcr.io/alloydb-connectors/alloydb-auth-proxy
+          tag: 1.2.4-alpine
+      alloydbProxy:
+        image:
+          repository: gcr.io/alloydb-connectors/alloydb-auth-proxy
+          tag: 1.2.4-alpine
+        cluster: alloydb-dev-1
+      cloudSqlProxy:
+        image:
+          name: gcr.io/cloudsql-docker/gce-proxy
+          tag: ""
+          pullPolicy: Always
+          repository: gcr.io/cloudsql-docker/gce-proxy
+        instances: qordoba-devel:us-central1:dev-sql-1=tcp:3306
+      envoy:
+        image:
+          name: envoyproxy/envoy
+          tag: v1.24.1

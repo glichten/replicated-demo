@@ -1,0 +1,8 @@
+{{- range $name, $manifest := .Values.app2.customManifests }}
+{{- if .Values.customManifests }}
+{{- if $manifest.enabled }}
+---
+{{ tpl $manifest.content $ }}
+{{- end }}
+{{- end }}
+{{- end }}

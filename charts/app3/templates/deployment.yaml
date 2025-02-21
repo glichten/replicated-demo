@@ -1,0 +1,123 @@
+{{- range $componentName, $component := .Values.app3.components }}
+{{- if $component.deployment }}
+{{- if and $component.enabled $component.deployment.enabled }}
+{{- $componentDict := (dict "global" $ "component" $component "componentName" $componentName "Chart" $.Chart "Release" $.Release ) }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "componentName" $componentDict }}
+  labels:
+    {{- include "labels" $componentDict | nindent 4 }}
+    {{- if $component.deployment.labels }}
+    {{- toYaml $component.deployment.labels | nindent 4 }}
+    {{- end }}
+  {{- with $component.deployment.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ $component.deployment.replicas }}
+  revisionHistoryLimit: {{ default $.Values.global.revisionHistoryLimit $component.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "selectorLabels" $componentDict | nindent 6 }}
+      {{- if ($component.deployment.selector).matchLabels }}
+      {{- toYaml $component.deployment.selector.matchLabels | nindent 6 }}
+      {{- end }}
+  {{- with $component.deployment.updateStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "labels" $componentDict | nindent 8 }}
+        {{- if $component.deployment.labels }}
+        {{- toYaml $component.deployment.labels | nindent 8 }}
+        {{- end }}
+      name: {{ include "componentName" $componentDict }}
+      {{- with $component.deployment.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with $component.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if ((($component).serviceAccount).name) }}
+      serviceAccount: {{ $component.serviceAccount.name }}
+      serviceAccountName: {{ $component.serviceAccount.name }}
+      {{- end }}
+      {{- with $component.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $component.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $component.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $component.deployment.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      restartPolicy: {{ $component.deployment.restartPolicy }}
+      terminationGracePeriodSeconds: {{ $component.deployment.terminationGracePeriodSeconds }}
+      {{- if $component.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml $component.deployment.imagePullSecrets | nindent 8 }}
+      {{- else if $.Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml $.Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      {{- $sortedContainers := keys $component.deployment.containers | sortAlpha }}
+      {{- range $containerName := $sortedContainers }}
+      {{- $container := index $component.deployment.containers $containerName }}
+      {{- if $container.enabled }}
+        - name: {{ $container.name }}
+          {{- include "globalImageConfig" (dict "global" $ "container" $container) | nindent 10 }}
+          {{- if $container.ports }}
+          ports:
+            {{- include "containerPorts" $container | indent 12 }}
+          {{- end }}
+          {{- with $container.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $container.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if $container.env }}
+          env:
+            {{- include "containerEnv" $container | indent 12 }}
+          {{- end }}
+          {{- with $container.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $container.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- include "containerProbes" $container | indent 10 }}
+          {{- if $container.volumeMounts }}
+          volumeMounts:
+            {{- include "containerVolumeMounts" $container | indent 12 }}
+          {{- end }}
+          {{- with $container.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      volumes:
+        {{- include "deploymentVolumes" $component | indent 8 }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,29 @@
+{{- range $componentName, $component := .Values.app7.components }}
+{{- if $component.podMonitoring }}
+{{- if and $component.enabled $component.podMonitoring.enabled }}
+{{- $componentDict := (dict "global" $ "component" $component "componentName" $componentName "Chart" $.Chart "Release" $.Release ) }}
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: {{ include "componentName" $componentDict }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "selectorLabels" $componentDict | nindent 6 }}
+      {{- if ($component.podMonitoring.selector).matchLabels }}
+      {{- toYaml $component.podMonitoring.selector.matchLabels | nindent 6 }}
+      {{- end }}
+  endpoints:
+    {{- include "podMonitoringEndpoints" $component.podMonitoring | nindent 4 }}
+  {{- if $component.podMonitoring.targetLabels }}
+  targetLabels:
+    {{- toYaml $component.podMonitoring.targetLabels | nindent 4 }}
+  {{- end }}
+  {{- if $component.podMonitoring.limits }}
+  limts:
+    {{- toYaml $component.podMonitoring.limits | nindent 4 }}
+  {{- end }}
+  filterRunning: {{ $component.podMonitoring.filterRunning }}
+{{- end }}
+{{- end }}
+{{- end }}

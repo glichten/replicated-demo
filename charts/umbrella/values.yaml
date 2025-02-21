@@ -1,0 +1,135 @@
+# Default values for umbrella.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  revisionHistoryLimit: null
+  namespace: "default"
+  domain: ""
+  environment: ""
+  provider: ""
+  project: ""
+  region: ""
+  aws:
+    acmCertArn: ""
+  google:
+    pubSubName: ""
+  alloydbProxy:
+    image:
+      repository: ""
+      tag: ""
+    cluster: ""
+  cloudSqlProxy:
+    image:
+      repository: ""
+    instances: ""
+  tls_cert_secret_name: ""
+app1:
+  enabled: true
+  app1:
+    components:
+      app1:
+        deployment:
+          containers:
+            app1:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app1
+                tag: 0.1.68-main
+app2:
+  enabled: true
+  app2:
+    components:
+      app2:
+        deployment:
+          containers:
+            app2:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app2
+                tag: 0.1.85-648d308
+app3:
+  enabled: true
+  app3:
+    components:
+      app3:
+        deployment:
+          containers:
+            app3:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app3
+                tag: 0.1.557-2f6b974
+app4:
+  enabled: true
+  app4:
+    components:
+      app4:
+        deployment:
+          containers:
+            app4:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app4
+                tag: 0.1.540-3ee18dc
+app5:
+  enabled: true
+  app5:
+    components:
+      app5:
+        deployment:
+          containers:
+            app5:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app5
+                tag: 0.4.49-update-qai
+app6:
+  enabled: true
+  app6:
+    components:
+      app6:
+        deployment:
+          containers:
+            app6:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app6
+                tag: 0.1.33-main
+app7:
+  enabled: true
+  app7:
+    components:
+      app7:
+        deployment:
+          containers:
+            app7:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app7
+                tag: 0.1.371-617bcab
+app8:
+  enabled: true
+  app8:
+    components:
+      app8:
+        deployment:
+          containers:
+            app8:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app8
+                tag: 0.1.26-main
+app9:
+  enabled: true
+  app9:
+    components:
+      app9:
+        deployment:
+          containers:
+            app9:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app9
+                tag: 0.1.35-e1df0b9
+app10:
+  enabled: true
+  app10:
+    components:
+      app10:
+        deployment:
+          containers:
+            app10:
+              image:
+                name: us-docker.pkg.dev/example/replicated-demo/app10
+                tag: 0.1.113-260fb4c

@@ -1,0 +1,26 @@
+apiVersion: kots.io/v1beta2
+kind: HelmChart
+metadata:
+  name: chart-name
+spec:
+  values:
+    app1:
+      enabled: true
+    app2:
+      enabled: false
+    app3:
+      enabled: true
+    app4:
+      enabled: false
+    app5:
+      enabled: false
+    app6:
+      enabled: true
+    app7:
+      enabled: true
+    app8:
+      enabled: true
+    app9:
+      enabled: true
+    app10:
+      enabled: true

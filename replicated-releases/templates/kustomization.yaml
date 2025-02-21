@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- kots_helm.yaml
+
+patches:
+- target:
+    kind: HelmChart
+    name: chart-name
+  path: merged_values.yaml
+- target:
+    kind: HelmChart
+    name: chart-name
+  path: enabled_apps.yaml
+- target:
+    kind: HelmChart
+    name: chart-name
+  path: images.yaml

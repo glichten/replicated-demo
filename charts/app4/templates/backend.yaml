@@ -1,0 +1,24 @@
+{{- range $componentName, $component := .Values.app4.components }}
+{{- if $component.backendConfig }}
+{{- if and $component.enabled $component.backendConfig.enabled }}
+{{- $componentDict := (dict "global" $ "component" $component "componentName" $componentName "Chart" $.Chart "Release" $.Release ) }}
+---
+kind: BackendConfig
+apiVersion: cloud.google.com/v1
+metadata:
+  name: {{ include "componentName" $componentDict }}
+spec:
+  healthCheck:
+    {{- toYaml $component.backendConfig.healthCheck | nindent 4 }}
+  {{- if $component.backendConfig.securityPolicyName }}
+  securityPolicy:
+    name: {{ $component.backendConfig.securityPolicyName }}
+  {{- end }}
+  logging:
+    {{- toYaml $component.backendConfig.logging | nindent 4 }}
+  {{- if $component.backendConfig.timeoutSec }}
+  timeoutSec: {{ $component.backendConfig.timeoutSec }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

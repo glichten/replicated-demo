@@ -1,0 +1,13 @@
+apiVersion: kots.io/v1beta1
+kind: Application
+metadata:
+  name: my-application
+spec:
+  title: Umbrella
+  icon: https://github.com/glichten/replicated-demo/blob/main/charts/umbrella/umbrella.png
+  # TODO: Template out releaseNotes based off of something
+  releaseNotes: TBD
+  allowRollback: false
+  supportMinimalRBACPrivileges: true
+  # statusInformers gets templated out based off of the apps enabled in enabled_apps.yaml
+  statusInformers: []

@@ -1,0 +1,89 @@
+apiVersion: kots.io/v1beta1
+kind: Config
+metadata:
+  name: whoami-config
+spec:
+  groups:
+  - name: global
+    title: Global Config
+    items:
+    - name: provider
+      title: Select Cloud Provider
+      type: radio
+      items:
+      - name: aws
+        title: AWS
+        - name: gcp
+          title: GCP
+    - name: region
+      title: Cloud Region
+      help_text: This must match the cloud region being deployed in. Eg. us-east-1
+      type: text
+    - name: environment
+      title: Environment
+      hidden: true
+      type: text
+      default: '{{repl if eq ChannelName "unstable" }}dev{{repl else if eq ChannelName "beta" }}test{{repl else }}prod{{repl end }}'
+    - name: cluster_name
+      title: Cluster Name
+      help_text: Name of the k8s cluster. This is sometimes used for naming resources.
+      type: text
+
+  - name: app_config
+    title: App Config
+    items:
+    - name: domain_name
+      title: Domain Name
+      help_text: The base domain name for the application. Eg. big-company.com
+      type: text
+    - name: subdomain_name
+      title: Subdomain Name
+      help_text: The subdomain for the application. Eg. writer in writer.big-company.com
+      type: text
+    - name: redis_url
+      title: Redis URL
+      type: text
+      help_text: Eg. redis://redis.big-company.com:5309/0
+    - name: open_search_url
+      title: Open Search URL
+      type: text
+      help_text: Eg. vpc-search-ext-abcdef.us-east-1.es.amazonaws.com
+    - name: service_account
+      title: K8s Service Account
+      type: text
+      help_text: "K8s service account used for the microservices. NB. default uses the default service account for the namespace. Default: default"
+      default: default
+    - name: ingress_annotations
+      title: Ingress Annotations
+      type: textarea
+      help_text: "Annotations to be added to the ingress. Eg. kubernetes.io/ingress.class: alb"
+    - name: ingress_tls_secret
+      title: Ingress TLS Secret
+      type: text
+      help_text: "Name of the secret containing the TLS certificate for the ingress. Eg. my-tls"
+
+  - name: aws_config
+    title: AWS Config
+    when: 'repl{{ ConfigOptionEquals "provider" "aws"}}'
+    items:
+    - name: aws_db_endpoint
+      title: RDS Endpoint
+      help_text: Connection endpoint for the RDS database.
+      type: text
+    - name: aws_s3_bucket
+      title: S3 Bucket
+      help_text: Pre-existing private S3 bucket name. Eg. my-app-bucket
+      type: text
+
+  - name: gcp_config
+    title: GCP Config
+    when: 'repl{{ ConfigOptionEquals "provider" "gcp"}}'
+    items:
+    - name: gcp_db_endpoint
+      title: RDS Endpoint
+      help_text: Connection endpoint for the AlloyDB database.
+      type: text
+    - name: gcp_s3_bucket
+      title: GCP Bucket
+      help_text: Pre-existing private gcp bucket name.
+      type: text

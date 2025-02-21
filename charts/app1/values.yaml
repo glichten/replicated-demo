@@ -1,0 +1,391 @@
+# -- Default values for app1.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  revisionHistoryLimit: 2
+  namespace: "default"
+  domain: ""
+  environment: ""
+  project: ""
+  region: ""
+  imagePullSecrets: []
+  example:
+    image:
+      name: example/image
+      tag: "v1.0.0"
+      pullPolicy: IfNotPresent
+
+app1:
+  # -- Application-wide configurations
+  # -- Override the chart name
+  nameOverride: ""
+  # -- Override the the app name
+  fullnameOverride: ""
+  components:
+    app1:
+      # -- Enable or disable this component
+      enabled: true
+      # -- Override the default component name
+      nameOverride: "app1"
+      # -- Service account configuration for the component
+      serviceAccount:
+        name: ""
+      deployment:
+        # -- Enable or disable the deployment for this component
+        enabled: true
+        # -- Number of replicas for the deployment
+        replicas: 1
+        # -- Revision history limit for the deployment
+        revisionHistoryLimit: null
+        # -- Selector labels for the deployment
+        # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#selector
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#labelselector-v1-meta 
+        selector: {}
+        # -- Update strategy for the deployment
+        # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#deploymentstrategy-v1-apps
+        updateStrategy:
+          rollingUpdate:
+            maxUnavailable: 25%
+            maxSurge: 25%
+          type: RollingUpdate
+        # -- Labels to apply to the deployment and pod
+        # The 'app' label will be automatically generated
+        # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#objectmeta-v1-meta
+        labels: {}
+        # -- Annotations to apply to the deployment
+        # https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#objectmeta-v1-meta
+        annotations: {}
+        # -- Node selector constraints for pod assignment
+        # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podspec-v1-core
+        nodeSelector: {}
+        # -- Tolerations for pod assignment
+        # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#toleration-v1-core
+        tolerations: []
+        # -- Topology spread constraints for pod assignment
+        # https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#topologyspreadconstraint-v1-core
+        topologySpreadConstraints: []
+        # -- Image pull secrets for the deployment
+        # https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+        imagePullSecrets: []
+        # -- Priority class name for the pod
+        # https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podspec-v1-core
+        priorityClassName: ""
+        # -- Affinity rules for pod assignment
+        # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#affinity-v1-core
+        affinity: {}
+        # -- Restart policy for the pod
+        # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podspec-v1-core
+        # Possible values: Always, OnFailure, Never
+        restartPolicy: Always
+        # -- Optional duration in seconds the pod needs to terminate gracefully.
+        # May be decreased in delete request. Value must be non-negative integer.
+        # The value zero indicates stop immediately via the kill signal (no opportunity to shut down).
+        # If this value is nil, the default grace period will be used instead.
+        # The grace period is the duration in seconds after the processes running in the pod are sent a
+        # termination signal and the time when the processes are forcibly halted with a kill signal.
+        # Set this value longer than the expected cleanup time for your process.
+        # Defaults to 30 seconds.
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podspec-v1-core
+        terminationGracePeriodSeconds: 30
+        # -- Additional Volumes mounted to the pod that are not directly mounted in a container.
+        # The main purpose of this is if you need to mount a volume to be used for environmental variables.
+        # This section is optional. Volumes added under 'volumeMounts' in the container configuration will be mounted automatically.
+        # Fields:
+        # - <volume-name>: (object) Configuration for additional volumes.
+        #   - enabled: (boolean) Enable or disable the additional volume. Default is true.
+        #   - <volumeType>: (object) Configuration for the Kubernetes volume type (e.g., secret, configMap, emptyDir, etc.).
+        #   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#volume-v1-core
+        additionalVolumes:
+          app-secrets:
+            enabled: true
+            secret:
+              secretName: my-app-secrets
+        # -- Map of containers in the pod
+        containers:
+          # This key is arbitrary and can be any string.
+          app1:
+            # -- Enable or disable this container
+            enabled: true
+            # -- Name of the container
+            name: app1
+            # -- Type of container: primary, init, or sidecar
+            type: primary
+            # -- Name to check in global values for the image
+            globalName: "example"
+            # -- Use the local image configuration for the container.
+            useLocalImageConfig: false
+            # -- Docker image configuration for the container.
+            # Fields:
+            # - repository: (string) The Docker repository where the image is stored.
+            # - tag: (string) The specific version of the Docker image to use.
+            # - pullPolicy: (string) The image pull policy. Possible values are Always, IfNotPresent, and Never.
+            image:
+              name: app1
+              tag: ""
+              pullPolicy: IfNotPresent
+            # -- Environment variables for the container.
+            # Fields:
+            # - <key>: (object) Configuration for each environment variable. The key is default env name.
+            #   - value: (string) The value of the environment variable.
+            #   - valueFrom: (object) https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#envvarsource-v1-core . If specified, 'value' will be ignored. 
+            #   - name: (string) The name of the environment variable (optional). If not included, the key will be used as the name.
+            #   - enabled: (boolean) Enable or disable the environment variable. Defaults to true if not specified.
+            env:
+              ENVIRONMENT:
+                value: "production"
+              DEBUG:
+                value: "false"
+                enabled: false
+              API-KEY:
+                name: "#test"
+                value: "default-key"
+                enabled: true
+            # -- Lifecycle requirements for the container
+            # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
+            # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#lifecycle-v1-core
+            lifecycle: {}
+            # -- Ports to expose from the container.
+            # Fields:
+            # - <key>: (object) Configuration for each port. The key is arbitrary and can be any string
+            #   - enabled: (boolean) Enable or disable this specific port. Default is true.
+            #   - name: (string) The name of the port. Used as the port name for the container and service by default. (optional)
+            #   - podPortName: (boolean) Whether the port name should be set on the container. If not specified or true, the name field will be used.
+            #   - servicePortNameOverride: (string) The name of the service port. If not specified, the name field will be used if specified.
+            #   - containerPort: (int) The port number on the container that is exposed.
+            #   - servicePort: (int) The port number to expose on the service.
+            #   - referenceContainerPortName: (boolean) Whether the port name should be used to refernce the container port instead of the containerPort on the service. If not specified containerPort will be used.
+            #   - protocol: (string) The protocol used by the port (e.g., TCP, UDP).
+            #   - exposed: (boolean) Whether the port should be exposed to the service. Default is true (optional)
+            ports:
+              http:
+                containerPort: 80
+                servicePort: 80
+                protocol: TCP
+              https:
+                name: https
+                containerPort: 443
+                servicePort: 443
+                protocol: TCP
+                exposed: true
+                enabled: true
+              metrics:
+                containerPort: 8080
+                servicePort: 8080
+                protocol: TCP
+                exposed: true
+                enabled: false
+            # -- Command to run in the container
+            # List of strings.
+            # command overrides the default ENTRYPOINT of the image.
+            command: []
+            # -- Arguments for the command
+            # list of strings
+            # args are used to pass arguments to the ENTRYPOINT of the image.
+            args: []
+            # -- Resource requirements for the container
+            # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+            # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#resourcerequirements-v1-core
+            resources:
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            # -- Probes for the container's health checks
+            # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+            # probe spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#probe-v1-core
+            probes:
+              startup:
+                httpGet:
+                  path: /health
+                  port: http
+                failureThreshold: 30
+                periodSeconds: 10
+            # -- Volume mounts for the container.
+            # Fields:
+            # - <key>: (object) Configuration for each volume mount. The key is arbitrary and can be any string.
+            #   - enabled: (boolean) Enable or disable this specific volume mount. Default is true.
+            #   - mountPath: (string) The path within the container at which the volume should be mounted.
+            #   - readOnly: (boolean) Whether the volume should be mounted read-only. Default is false.
+            #   - volume: (object) The volume configuration.
+            #     - name: (string) The name of the volume.
+            #     - <volumeType>: (object) The type of volume (e.g., configMap, secret, emptyDir, etc.).
+            #       - <volumeTypeSpecificFields>: Fields specific to the chosen volume type.
+            volumeMounts:
+              config:
+                enabled: true
+                mountPath: /app/config
+                volume:
+                  name: config-volume
+                  configMap:
+                    name: backend-config
+              data:
+                enabled: true
+                mountPath: /app/data
+                volume:
+                  name: data-volume
+                  emptyDir: {}
+            # -- Security context for the container
+            # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+            # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+            securityContext: {}
+
+      # -- Service configuration for the component.
+      service:
+        # enable or disable the service for this component
+        # If there are no ports exposed on the containers or defined in additionalPorts, the service will not be created.
+        enabled: true
+        # -- annotations for the service
+        annotations: {}
+        # type of service to create
+        # possible values: ClusterIP, NodePort, LoadBalancer
+        type: ClusterIP
+        # The internal traffic policy for the service
+        # possible values: Cluster, Local
+        internalTrafficPolicy: Cluster
+        # The Ip families for the service
+        # possible values: IPv4, IPv6
+        ipFamilies:
+        - IPv4
+
+      ingress:
+        # -- Enable or disable the ingress for this component
+        enabled: true
+        # -- Ingress class name
+        # https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class
+        className: ""
+        # -- Annotations for the ingress
+        annotations: {}
+        # -- Default backend configuration for the ingress
+        # https://kubernetes.io/docs/concepts/services-networking/ingress/#default-backend
+        # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#ingressbackend-v1-networking-k8s-io
+        defaultBackend: {}
+
+        # -- A map of ingress rules. Each key is a unique identifier for the rule.
+        # Fields:
+        # - <key>: (object) Configuration for each rule. The key is arbitrary and can be any string.
+        #   - enabled: (boolean) Enable or disable this specific rule. Default is true.
+        #   - host: (string) The host for which this rule applies. If not specified, the rule applies to all hosts.
+        #   - paths: (object) A map of paths for this rule. The key is arbitrary and can be any string.
+        #     - <key>: (object) Configuration for each path. The key is arbitrary and can be any string.
+        #       - enabled: (boolean) Enable or disable this specific path. Default is true.
+        #       - pathObject: (object) The path configuration as defined in https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#httpingresspath-v1-networking-k8s-io
+        #       https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+        rules: {}
+
+        # -- A map of TLS configurations. Each key is a unique identifier for the TLS config.
+        # Fields:
+        # - <tlsName>: (object) Configuration for each TLS configuration.
+        #   - enabled: (boolean) Enable or disable this specific TLS configuration. Default is true.
+        #   - hosts: (array) A list of hosts included in the TLS certificate.
+        #     - (string) Each host included in the TLS certificate.
+        #   - secretName: (string) The name of the secret used to terminate SSL traffic on the ingress.
+        tls: {}
+
+      frontendConfig:
+        # -- Enable or disable the frontend configuration for this component
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#configuring_ingress_features_through_frontendconfig_parameters
+        enabled: true
+        # -- SSL policy for the frontend configuration
+        sslPolicy: ""
+        # -- Redirect to HTTPS configuration
+        redirectToHttps:
+          enabled: false
+          responseCodeName: ""
+
+      backendConfig:
+        # -- Enable or disable the backend configuration for this component
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#configuring_ingress_features_through_backendconfig_parameters
+        enabled: true
+        # -- Health check configuration for the backend
+        # https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#direct_health
+        healthCheck: {}
+        # -- Security policy name for the backend
+        securityPolicyName: ""
+        # -- Logging configuration for the backend
+        logging: {}
+        # -- Timeout in seconds for the backend
+        timeoutSec: 30
+
+      # -- Pod monitor configuration
+      # https://github.com/GoogleCloudPlatform/prometheus-engine/blob/v0.14.0/doc/api.md#monitoring.googleapis.com/v1.PodMonitoringSpec
+      # Fields:
+      #   enabled: (boolean) Enable or disable the pod monitor for this component. Default is false.
+      #   selectorLabels: (object) Selector labels for the pod monitor. Defaults to the deployment selector labels.
+      #   endpoints: (object) Endpoints for the pod monitor.
+      #     <key>: (object) Configuration for each endpoint. The key is arbitrary and can be any string.
+      #       - port: (IntOrString) Required; Name or number of the port to scrape. The container metadata label is only populated if the port is referenced by name because port numbers are not unique across containers.
+      #       - interval: (string) Optional; Interval at which to scrape metrics. Must be a valid Prometheus duration
+      #       - path: (string) Optional; HTTP path to scrape metrics from. Defaults to “/metrics”.
+      #       - params: (map[string][]string) Optional; HTTP GET params to use when scraping.
+      #       - scheme: (string) Optional; Protocol scheme to use to scrape.
+      #       - timeout: (string) Optional; Timeout for metrics scrapes. Must be a valid Prometheus duration. Must not be larger than the scrape interval.
+      #       - metricRelabeling: (object) Optional; Relabeling rules for metrics scraped from this endpoint. Relabeling rules that override protected target labels (project_id, location, cluster, namespace, job, instance, or address) are not permitted. The labelmap action is not permitted in general.
+      #       - HTTPClientConfig: (object) Optional; Prometheus HTTP client configuration.
+      #   targetLabels: (object) Labels to add to the Prometheus target for discovered endpoints. The instance label is always set to <pod_name>:<port> or <node_name>:<port> if the scraped pod is controlled by a DaemonSet.
+      #   limits: (object) Limits to apply at scrape time.
+      #   filterRunning: (boolean) Drop any pods that are in the “Failed” or “Succeeded” pod lifecycle. Default is true. See: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
+      podMonitoring:
+        enabled: false
+        selectorLabels: {}
+        endpoints: {}
+        # -- Target labels for the pod monitor
+        targetLabels: {}
+        # -- Limits for the pod monitor
+        limits: {}
+        # -- FilterRunning will drop any pods that are in the “Failed” or “Succeeded” pod lifecycle.
+        # See: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
+        filterRunning: true
+
+  # -- You can add more components by duplicating the 'backend' structure
+  # and changing the values as needed.
+  # -- Configuration for the ConfigMap
+  # Fields:
+  # <key>: (object) Configuration for each ConfigMap. The key is arbitrary and can be any string.
+  #   name: (string) The name of the ConfigMap.
+  #   binaryData: (object) Binary data to include in the ConfigMap.
+  #     <key>: (object) Configuration for each binary data value. The key is arbitrary and can be any string.
+  #       - name: (string) The name of the binary data value.
+  #       - value: (string) The value of the binary
+  #   data: (object) Data to include in the ConfigMap.
+  #     <key>: (object) Configuration for each data value. The key is arbitrary and can be any string.
+  #       - name: (string) The name of the data value.
+  #       - value: (string) The value of the data value. Can only be used if 'template' is not specified.
+  #       - template: (string) The name of the template file to use for the data value. (Template file must exist in charts files directory)
+  #       - variables: (object) Variables to pass to the template file.
+  configMap:
+    app1:
+      name: app1-config
+      binaryData: {}
+      data:
+        configjs:
+          name: config.js
+          value: |-
+            test
+             test
+              test
+        envoyConf:
+          name: envoy.conf
+          template: envoy-config.tpl
+          variables:
+            externalAuthzTimeout: 30s
+            # `raw` allows for raw text to be passed through to the template
+            # NOTE: This ONLY works for dev environments as it's intended for ease of testing prior to making changes to the chart/template
+            raw: ""
+
+  # -- Custom manifests to be included in the deployment.
+  # Fields:
+  # - <manifestName>: (object) Configuration for each custom manifest.
+  #   - enabled: (boolean) Enable or disable this specific custom manifest. Default is false.
+  #   - content: (string) The YAML content of the custom manifest. You can imbed helm template functions in the content and it will be rendered.
+  customManifests: {}
